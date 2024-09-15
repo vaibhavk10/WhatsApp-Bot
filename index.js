@@ -9,7 +9,6 @@ const tagAllCommand = require('./commands/tagall');
 const helpCommand = require('./commands/help');
 const welcomeNewMembers = require('./commands/welcome');
 const sayGoodbye = require('./commands/goodbye');
-const gptCommand = require('./commands/gpt');
 const banCommand = require('./commands/ban');
 const promoteCommand = require('./commands/promote');
 const demoteCommand = require('./commands/demote');
@@ -60,10 +59,7 @@ async function startBot() {
         }
 
         // Command handling
-        if (userMessage.startsWith('.gpt ')) {
-            const query = userMessage.slice(5);
-            await gptCommand(sock, chatId, query);
-        } else if (userMessage === '.help' || userMessage === '.menu') {
+          if (userMessage === '.help' || userMessage === '.menu') {
             await helpCommand(sock, chatId);
         } else if (userMessage === '.tagall' && chatId.endsWith('@g.us')) {
             if (isSenderAdmin || message.key.fromMe) {

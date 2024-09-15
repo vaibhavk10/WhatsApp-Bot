@@ -6,23 +6,33 @@ async function helpCommand(sock, chatId) {
 *${settings.botName || 'WhatsApp Bot'}* - Version ${settings.version || '1.0.0'}
 _Bot by ${settings.botOwner || 'Unknown Owner'}_
 
-Here are the available commands:
+Available commands:
 
 *General Commands:*
-1. *.help* or *.menu* - Display this help message.
-2. *.gpt <query>* - Ask any question or query to the bot using ChatGPT.
-3. *.tagall* - Tag all members of a group (Admin only).
-4. *.sticker* - Convert an image or video into a sticker.
+.help or .menu
+.tts <text>
+.sticker or .s
+.owner
 
 *Admin Commands:*
-5. *.ban @user* - Remove or ban a user from the group (Admin only).
-6. *.promote @user* - Promote a user to admin (Admin only).
-7. *.demote @user* - Demote an admin to a regular user (Admin only).
-8. *.mute <minutes>* - Mute the group for a specified time (Admin only).
-9. *.unmute* - Unmute the group, allowing members to send messages (Admin only).
+.ban @user
+.promote @user
+.demote @user
+.mute <minutes>
+.unmute
+.delete or .del
+
+*Game Commands:*
+.tictactoe @user
+.move <position>
 
 *Group Management:*
-10. Automated welcome and goodbye messages for new and leaving members.
+.tagall
+
+*Other:*
+.topmembers
+.antilink
+.meme
 `;
 
     try {

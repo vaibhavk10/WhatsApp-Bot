@@ -18,6 +18,14 @@ const stickerCommand = require('./commands/sticker');
 const isAdmin = require('./helpers/isAdmin');
 const warnCommand = require('./commands/warn');
 const warningsCommand = require('./commands/warnings');
+const ttsCommand = require('./commands/tts');
+const { tictactoeCommand, tictactoeMove } = require('./commands/tictactoe');
+const { incrementMessageCount, topMembers } = require('./commands/topmembers');
+const ownerCommand = require('./commands/owner');
+const deleteCommand = require('./commands/delete');
+const { handleAntilinkCommand, handleLinkDetection } = require('./commands/antilink');
+const memeCommand = require('./commands/meme');
+const tagCommand = require('./commands/tag');
 
 async function startBot() {
     const { state, saveCreds } = await useMultiFileAuthState('./auth_info');
@@ -43,55 +51,103 @@ async function startBot() {
             userMessage = message.message.extendedTextMessage.text.trim().toLowerCase();
         }
 
+        const isGroup = chatId.endsWith('@g.us');
+
         if (!userMessage.startsWith('.')) return;
 
-        const { isSenderAdmin, isBotAdmin } = await isAdmin(sock, chatId, senderId);
+        let isSenderAdmin = false;
+        let isBotAdmin = false;
 
-        if (!isBotAdmin) {
-            await sock.sendMessage(chatId, { text: 'Please make the bot an admin first.' });
-            return;
-        }
+        if (isGroup) {
+            const adminStatus = await isAdmin(sock, chatId, senderId);
+            isSenderAdmin = adminStatus.isSenderAdmin;
+            isBotAdmin = adminStatus.isBotAdmin;
 
-        if (userMessage === '.mute' || userMessage === '.unmute' || userMessage.startsWith('.ban') || userMessage.startsWith('.promote') || userMessage.startsWith('.demote')) {
-            if (!isSenderAdmin && !message.key.fromMe) {
-                await sock.sendMessage(chatId, { text: 'Sorry, only group admins can use this command.' });
+            if (!isBotAdmin) {
+                await sock.sendMessage(chatId, { text: 'Please make the bot an admin first.' });
                 return;
             }
+
+            if (
+                userMessage === '.mute' ||
+                userMessage === '.unmute' ||
+                userMessage.startsWith('.ban') ||
+                userMessage.startsWith('.promote') ||
+                userMessage.startsWith('.demote')
+            ) {
+                if (!isSenderAdmin && !message.key.fromMe) {
+                    await sock.sendMessage(chatId, { text: 'Sorry, only group admins can use this command.' });
+                    return;
+                }
+            }
+
+            if (userMessage === '.tagall') {
+                if (isSenderAdmin || message.key.fromMe) {
+                    await tagAllCommand(sock, chatId, senderId);
+                } else {
+                    await sock.sendMessage(chatId, { text: 'Sorry, only group admins can use the .tagall command.' });
+                }
+            }
+
+            if (userMessage.startsWith('.promote')) {
+                const mentionedJidList = message.message.extendedTextMessage?.contextInfo?.mentionedJid || [];
+                await promoteCommand(sock, chatId, mentionedJidList);
+            } else if (userMessage.startsWith('.demote')) {
+                const mentionedJidList = message.message.extendedTextMessage?.contextInfo?.mentionedJid || [];
+                await demoteCommand(sock, chatId, mentionedJidList);
+            }
         }
 
-    
+        if (!message.key.fromMe) {
+            incrementMessageCount(chatId, senderId);
+        }
 
-        if (userMessage === '.help' || userMessage === '.menu') {
+        if (userMessage === '.topmembers') {
+            topMembers(sock, chatId);
+        } else if (userMessage === '.help' || userMessage === '.menu') {
             await helpCommand(sock, chatId);
-        } else if (userMessage === '.tagall' && chatId.endsWith('@g.us')) {
-            if (isSenderAdmin || message.key.fromMe) {
-                await tagAllCommand(sock, chatId, senderId);
-            } else {
-                await sock.sendMessage(chatId, { text: 'Sorry, only group admins can use the .tagall command.' });
-            }
-        } else if (userMessage.startsWith('.ban')) {
-            const mentionedJidList = message.message.extendedTextMessage?.contextInfo?.mentionedJid || [];
-            await banCommand(sock, chatId, mentionedJidList);
-        } else if (userMessage.startsWith('.promote')) {
-            const mentionedJidList = message.message.extendedTextMessage?.contextInfo?.mentionedJid || [];
-            await promoteCommand(sock, chatId, mentionedJidList);
-        } else if (userMessage.startsWith('.demote')) {
-            const mentionedJidList = message.message.extendedTextMessage?.contextInfo?.mentionedJid || [];
-            await demoteCommand(sock, chatId, mentionedJidList);
-        } else if (userMessage.startsWith('.mute')) {
-            const duration = parseInt(userMessage.split(' ')[1]);
-            await muteCommand(sock, chatId, senderId, duration);
-        } else if (userMessage === '.unmute') {
-            await unmuteCommand(sock, chatId);
-        } else if (userMessage.startsWith('.sticker')) {  // Add the sticker command
+        } else if (userMessage.startsWith('.sticker') || userMessage.startsWith('.s')) {
             await stickerCommand(sock, chatId, message);
-        } else if (userMessage.startsWith('.warn')) {
+        } else if (userMessage.startsWith('.warn') && isGroup) {
             const mentionedJidList = message.message.extendedTextMessage?.contextInfo?.mentionedJid || [];
             await warnCommand(sock, chatId, senderId, mentionedJidList);
-        } else if (userMessage.startsWith('.warnings')) {
+        } else if (userMessage.startsWith('.warnings') && isGroup) {
             const mentionedJidList = message.message.extendedTextMessage?.contextInfo?.mentionedJid || [];
             await warningsCommand(sock, chatId, mentionedJidList);
+        } else if (userMessage.startsWith('.tts')) {
+            const text = userMessage.slice(4).trim();
+            await ttsCommand(sock, chatId, text);
+        } else if (userMessage === '.delete' || userMessage === '.del') {
+            await deleteCommand(sock, chatId, message, senderId);
+        } else if (userMessage === '.owner') {
+            await ownerCommand(sock, chatId);
+        } else if (userMessage.startsWith('.tag')) {
+            const messageText = userMessage.slice(4).trim();
+            const replyMessage = message.message?.extendedTextMessage?.contextInfo?.quotedMessage || null;
+            await tagCommand(sock, chatId, senderId, messageText, replyMessage);
+            return;
+        } else if (userMessage.startsWith('.antilink')) {
+            await handleAntilinkCommand(sock, chatId, userMessage, senderId, isSenderAdmin);
+            return;
+        } else if (userMessage === '.meme') {
+            await memeCommand(sock, chatId);
+        } else if (userMessage.startsWith('.tictactoe')) {
+            const mentions = message.message.extendedTextMessage?.contextInfo?.mentionedJid || [];
+            if (mentions.length === 1) {
+                const playerX = senderId;
+                const playerO = mentions[0];
+                tictactoeCommand(sock, chatId, playerX, playerO);
+            } else {
+                await sock.sendMessage(chatId, { text: 'Please mention one player to start a game of Tic-Tac-Toe.' });
+            }
         }
+
+        if (userMessage.startsWith('.move')) {
+            const position = parseInt(userMessage.split(' ')[1]);
+            tictactoeMove(sock, chatId, senderId, position);
+        }
+
+        await handleLinkDetection(sock, chatId, message, userMessage, senderId);
     });
 
     sock.ev.on('group-participants.update', async (update) => {
@@ -122,7 +178,7 @@ async function startBot() {
             if (shouldReconnect) {
                 startBot();
             } else {
-                console.log("Logged out from WhatsApp. Please restart the bot and scan the QR code again.");
+                console.log('Logged out from WhatsApp. Please restart the bot and scan the QR code again.');
             }
         } else if (connection === 'open') {
             console.log(chalk.green('Connected to WhatsApp!'));

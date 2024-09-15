@@ -52,7 +52,6 @@ async function startBot() {
         }
 
         const isGroup = chatId.endsWith('@g.us');
-
         if (!userMessage.startsWith('.')) return;
 
         let isSenderAdmin = false;
@@ -102,52 +101,64 @@ async function startBot() {
             incrementMessageCount(chatId, senderId);
         }
 
-        if (userMessage === '.topmembers') {
-            topMembers(sock, chatId);
-        } else if (userMessage === '.help' || userMessage === '.menu') {
-            await helpCommand(sock, chatId);
-        } else if (userMessage.startsWith('.sticker') || userMessage.startsWith('.s')) {
-            await stickerCommand(sock, chatId, message);
-        } else if (userMessage.startsWith('.warn') && isGroup) {
-            const mentionedJidList = message.message.extendedTextMessage?.contextInfo?.mentionedJid || [];
-            await warnCommand(sock, chatId, senderId, mentionedJidList);
-        } else if (userMessage.startsWith('.warnings') && isGroup) {
-            const mentionedJidList = message.message.extendedTextMessage?.contextInfo?.mentionedJid || [];
-            await warningsCommand(sock, chatId, mentionedJidList);
-        } else if (userMessage.startsWith('.tts')) {
-            const text = userMessage.slice(4).trim();
-            await ttsCommand(sock, chatId, text);
-        } else if (userMessage === '.delete' || userMessage === '.del') {
-            await deleteCommand(sock, chatId, message, senderId);
-        } else if (userMessage === '.owner') {
-            await ownerCommand(sock, chatId);
-        } else if (userMessage.startsWith('.tag')) {
-            const messageText = userMessage.slice(4).trim();
-            const replyMessage = message.message?.extendedTextMessage?.contextInfo?.quotedMessage || null;
-            await tagCommand(sock, chatId, senderId, messageText, replyMessage);
-            return;
-        } else if (userMessage.startsWith('.antilink')) {
-            await handleAntilinkCommand(sock, chatId, userMessage, senderId, isSenderAdmin);
-            return;
-        } else if (userMessage === '.meme') {
-            await memeCommand(sock, chatId);
-        } else if (userMessage.startsWith('.tictactoe')) {
-            const mentions = message.message.extendedTextMessage?.contextInfo?.mentionedJid || [];
-            if (mentions.length === 1) {
-                const playerX = senderId;
-                const playerO = mentions[0];
-                tictactoeCommand(sock, chatId, playerX, playerO);
-            } else {
-                await sock.sendMessage(chatId, { text: 'Please mention one player to start a game of Tic-Tac-Toe.' });
-            }
+        switch (true) {
+            case userMessage === '.topmembers':
+                topMembers(sock, chatId);
+                break;
+            case userMessage === '.help' || userMessage === '.menu':
+                await helpCommand(sock, chatId);
+                break;
+            case userMessage.startsWith('.sticker') || userMessage.startsWith('.s'):
+                await stickerCommand(sock, chatId, message);
+                break;
+            case userMessage.startsWith('.warn') && isGroup:
+                const mentionedJidListWarn = message.message.extendedTextMessage?.contextInfo?.mentionedJid || [];
+                await warnCommand(sock, chatId, senderId, mentionedJidListWarn);
+                break;
+            case userMessage.startsWith('.warnings') && isGroup:
+                const mentionedJidListWarnings = message.message.extendedTextMessage?.contextInfo?.mentionedJid || [];
+                await warningsCommand(sock, chatId, mentionedJidListWarnings);
+                break;
+            case userMessage.startsWith('.tts'):
+                const text = userMessage.slice(4).trim();
+                await ttsCommand(sock, chatId, text);
+                break;
+            case userMessage === '.delete' || userMessage === '.del':
+                await deleteCommand(sock, chatId, message, senderId);
+                break;
+            case userMessage === '.owner':
+                await ownerCommand(sock, chatId);
+                break;
+            case userMessage.startsWith('.tag'):
+                const messageText = userMessage.slice(4).trim();
+                const replyMessage = message.message?.extendedTextMessage?.contextInfo?.quotedMessage || null;
+                await tagCommand(sock, chatId, senderId, messageText, replyMessage);
+                break;
+            case userMessage.startsWith('.antilink'):
+                await handleAntilinkCommand(sock, chatId, userMessage, senderId, isSenderAdmin);
+                break;
+            case userMessage === '.meme':
+                await memeCommand(sock, chatId);
+                break;
+            case userMessage.startsWith('.tictactoe'):
+                const mentions = message.message.extendedTextMessage?.contextInfo?.mentionedJid || [];
+                if (mentions.length === 1) {
+                    const playerX = senderId;
+                    const playerO = mentions[0];
+                    tictactoeCommand(sock, chatId, playerX, playerO);
+                } else {
+                    await sock.sendMessage(chatId, { text: 'Please mention one player to start a game of Tic-Tac-Toe.' });
+                }
+                break;
+            case userMessage.startsWith('.move'):
+                const position = parseInt(userMessage.split(' ')[1]);
+                tictactoeMove(sock, chatId, senderId, position);
+                break;
+            default:
+                await handleLinkDetection(sock, chatId, message, userMessage, senderId);
+                
+                break;
         }
-
-        if (userMessage.startsWith('.move')) {
-            const position = parseInt(userMessage.split(' ')[1]);
-            tictactoeMove(sock, chatId, senderId, position);
-        }
-
-        await handleLinkDetection(sock, chatId, message, userMessage, senderId);
     });
 
     sock.ev.on('group-participants.update', async (update) => {

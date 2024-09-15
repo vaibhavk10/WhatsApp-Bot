@@ -19,6 +19,14 @@ The bot is lightweight and can be run on a Node.js environment. The bot supports
 
 ---
 
+## One-click Deployment on Replit
+
+You can easily deploy this WhatsApp bot on Replit with one click. Replit will automatically install the necessary dependencies and give you a web environment to run the bot.
+
+[![Run on Replit](https://replit.com/badge/github/vaibhavk10/Whatsapp-TagAll-Bot)](https://replit.com/github/vaibhavk10/Whatsapp-TagAll-Bot)
+
+---
+
 ## 🛠️ Setup & Installation
 
 ### Prerequisites
@@ -35,14 +43,11 @@ The bot is lightweight and can be run on a Node.js environment. The bot supports
 2. **Install the dependencies:**
    ```bash
    npm install
-3. **Configure the bot:**
-   ```bash
-   node index.js
-4. **Run the bot:**
+3. **Run the bot:**
    ```bash
    node index.js
 ---
-5. **Scan the QR code:**
+4. **Scan the QR code:**
 
 Once the bot starts, a QR code will appear in the terminal. Scan this QR code using the Linked Devices feature in WhatsApp to connect your WhatsApp account with the bot.
 

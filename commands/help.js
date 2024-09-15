@@ -13,6 +13,11 @@ Available commands:
 .tts <text>
 .sticker or .s
 .owner
+.joke
+.quote
+.fact
+.weather <city>
+.news
 
 *Admin Commands:*
 .ban @user

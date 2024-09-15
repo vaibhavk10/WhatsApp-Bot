@@ -1,5 +1,6 @@
 const settings = require('./settings');
 const chalk = require('chalk');
+require('dotenv').config()
 global.packname = settings.packname;
 global.author = settings.author;
 

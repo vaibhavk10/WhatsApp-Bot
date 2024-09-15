@@ -16,6 +16,8 @@ const muteCommand = require('./commands/mute');
 const unmuteCommand = require('./commands/unmute');
 const stickerCommand = require('./commands/sticker');
 const isAdmin = require('./helpers/isAdmin');
+const warnCommand = require('./commands/warn');
+const warningsCommand = require('./commands/warnings');
 
 async function startBot() {
     const { state, saveCreds } = await useMultiFileAuthState('./auth_info');
@@ -83,6 +85,12 @@ async function startBot() {
             await unmuteCommand(sock, chatId);
         } else if (userMessage.startsWith('.sticker')) {  // Add the sticker command
             await stickerCommand(sock, chatId, message);
+        } else if (userMessage.startsWith('.warn')) {
+            const mentionedJidList = message.message.extendedTextMessage?.contextInfo?.mentionedJid || [];
+            await warnCommand(sock, chatId, senderId, mentionedJidList);
+        } else if (userMessage.startsWith('.warnings')) {
+            const mentionedJidList = message.message.extendedTextMessage?.contextInfo?.mentionedJid || [];
+            await warningsCommand(sock, chatId, mentionedJidList);
         }
     });
 

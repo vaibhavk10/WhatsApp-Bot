@@ -1,5 +1,5 @@
 const isAdmin = require('../helpers/isAdmin');
-const { downloadContentFromMessage } = require('@whiskeysockets/baileys'); // Import media download helper
+const { downloadContentFromMessage } = require('@whiskeysockets/baileys');
 const fs = require('fs');
 const path = require('path');
 
@@ -23,7 +23,11 @@ async function tagCommand(sock, chatId, senderId, messageText, replyMessage) {
     }
 
     if (!isSenderAdmin) {
-        await sock.sendMessage(chatId, { text: 'Only group admins can use the .tag feature.' });
+        const stickerPath = './assets/abeysaale.webp';  // Path to your sticker
+        if (fs.existsSync(stickerPath)) {
+            const stickerBuffer = fs.readFileSync(stickerPath);
+            await sock.sendMessage(chatId, { sticker: stickerBuffer });
+        }
         return;
     }
 

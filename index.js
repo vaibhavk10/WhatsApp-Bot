@@ -26,6 +26,12 @@ const deleteCommand = require('./commands/delete');
 const { handleAntilinkCommand, handleLinkDetection } = require('./commands/antilink');
 const memeCommand = require('./commands/meme');
 const tagCommand = require('./commands/tag');
+const jokeCommand = require('./commands/joke');
+const quoteCommand = require('./commands/quote');
+const factCommand = require('./commands/fact');
+const weatherCommand = require('./commands/weather');
+const newsCommand = require('./commands/news');
+
 
 async function startBot() {
     const { state, saveCreds } = await useMultiFileAuthState('./auth_info');
@@ -140,6 +146,26 @@ async function startBot() {
             case userMessage === '.meme':
                 await memeCommand(sock, chatId);
                 break;
+                case userMessage === '.joke':
+                    await jokeCommand(sock, chatId);
+                    break;
+                case userMessage === '.quote':
+                    await quoteCommand(sock, chatId);
+                    break;
+                case userMessage === '.fact':
+                    await factCommand(sock, chatId);
+                    break;
+                case userMessage.startsWith('.weather'):
+                    const city = userMessage.split(' ')[1];
+                    if (city) {
+                        await weatherCommand(sock, chatId, city);
+                    } else {
+                        await sock.sendMessage(chatId, { text: 'Please specify a city, e.g., .weather London' });
+                    }
+                    break;
+                case userMessage === '.news':
+                    await newsCommand(sock, chatId);
+                    break;
             case userMessage.startsWith('.tictactoe'):
                 const mentions = message.message.extendedTextMessage?.contextInfo?.mentionedJid || [];
                 if (mentions.length === 1) {

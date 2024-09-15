@@ -14,7 +14,8 @@ const promoteCommand = require('./commands/promote');
 const demoteCommand = require('./commands/demote');
 const muteCommand = require('./commands/mute');
 const unmuteCommand = require('./commands/unmute');
-const isAdmin = require('./helpers/isAdmin'); // Helper to check admin status
+const stickerCommand = require('./commands/sticker');
+const isAdmin = require('./helpers/isAdmin');
 
 async function startBot() {
     const { state, saveCreds } = await useMultiFileAuthState('./auth_info');
@@ -44,13 +45,11 @@ async function startBot() {
 
         const { isSenderAdmin, isBotAdmin } = await isAdmin(sock, chatId, senderId);
 
-        // If the bot is not an admin, send a message and return early
         if (!isBotAdmin) {
             await sock.sendMessage(chatId, { text: 'Please make the bot an admin first.' });
             return;
         }
 
-        // Only allow admins to use admin commands (mute, unmute, ban, promote, demote)
         if (userMessage === '.mute' || userMessage === '.unmute' || userMessage.startsWith('.ban') || userMessage.startsWith('.promote') || userMessage.startsWith('.demote')) {
             if (!isSenderAdmin && !message.key.fromMe) {
                 await sock.sendMessage(chatId, { text: 'Sorry, only group admins can use this command.' });
@@ -58,8 +57,9 @@ async function startBot() {
             }
         }
 
-        // Command handling
-          if (userMessage === '.help' || userMessage === '.menu') {
+    
+
+        if (userMessage === '.help' || userMessage === '.menu') {
             await helpCommand(sock, chatId);
         } else if (userMessage === '.tagall' && chatId.endsWith('@g.us')) {
             if (isSenderAdmin || message.key.fromMe) {
@@ -78,9 +78,11 @@ async function startBot() {
             await demoteCommand(sock, chatId, mentionedJidList);
         } else if (userMessage.startsWith('.mute')) {
             const duration = parseInt(userMessage.split(' ')[1]);
-            await muteCommand(sock, chatId, duration);
+            await muteCommand(sock, chatId, senderId, duration);
         } else if (userMessage === '.unmute') {
             await unmuteCommand(sock, chatId);
+        } else if (userMessage.startsWith('.sticker')) {  // Add the sticker command
+            await stickerCommand(sock, chatId, message);
         }
     });
 

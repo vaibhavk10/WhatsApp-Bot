@@ -1,8 +1,6 @@
 <!DOCTYPE html>
 <html>
-<head>
-    <title>Knight WhatsApp Bot</title>
-</head>
+
 <body>
 
 <h1>🤖 Knight WhatsApp Bot</h1>

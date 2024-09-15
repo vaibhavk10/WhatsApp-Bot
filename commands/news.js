@@ -2,7 +2,7 @@ const axios = require('axios');
 
 module.exports = async function (sock, chatId) {
     try {
-        const apiKey = 'YOUR_NEWSAPI_KEY';  // Replace with your NewsAPI key
+        const apiKey = 'dcd720a6f1914e2d9dba9790c188c08c';  // Replace with your NewsAPI key
         const response = await axios.get(`https://newsapi.org/v2/top-headlines?country=us&apiKey=${apiKey}`);
         const articles = response.data.articles.slice(0, 5); // Get top 5 articles
         let newsMessage = '📰 *Latest News*:\n\n';

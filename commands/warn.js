@@ -60,5 +60,5 @@ async function warnCommand(sock, chatId, senderId, mentionedJidList) {
         await sock.sendMessage(chatId, { text: `User has been warned. Total warnings: ${warnings[userToWarn]}` });
     }
 }
-
+//hi
 module.exports = warnCommand;

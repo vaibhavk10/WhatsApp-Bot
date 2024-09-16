@@ -34,6 +34,8 @@ const factCommand = require('./commands/fact');
 const weatherCommand = require('./commands/weather');
 const newsCommand = require('./commands/news');
 const kickCommand = require('./commands/kick');
+const simageCommand = require('./commands/simage');
+
 
 async function startBot() {
     const { state, saveCreds } = await useMultiFileAuthState('./auth_info');
@@ -52,36 +54,36 @@ async function startBot() {
 
         if (!message.message) return;
 
-            let userMessage = '';
-            if (message.message?.conversation) {
-                userMessage = message.message.conversation.trim().toLowerCase();
-            } else if (message.message?.extendedTextMessage?.text) {
-                userMessage = message.message.extendedTextMessage.text.trim().toLowerCase();
+        let userMessage = '';
+        if (message.message?.conversation) {
+            userMessage = message.message.conversation.trim().toLowerCase();
+        } else if (message.message?.extendedTextMessage?.text) {
+            userMessage = message.message.extendedTextMessage.text.trim().toLowerCase();
+        }
+        userMessage = userMessage.replace(/\.\s+/g, '.').trim();
+        const isGroup = chatId.endsWith('@g.us');
+
+        if (!isGroup && (userMessage === 'hi' || userMessage === 'hello')) {
+            await sock.sendMessage(chatId, {
+                text: 'Hi, How can I help you?\nYou can use .menu for more info and commands.'
+            });
+            return; // Stop further processing if a private chat says "hi" or "hello"
+        }
+
+        if (!userMessage.startsWith('.')) return;
+
+        let isSenderAdmin = false;
+        let isBotAdmin = false;
+
+        if (isGroup) {
+            const adminStatus = await isAdmin(sock, chatId, senderId);
+            isSenderAdmin = adminStatus.isSenderAdmin;
+            isBotAdmin = adminStatus.isBotAdmin;
+
+            if (!isBotAdmin) {
+                await sock.sendMessage(chatId, { text: 'Please make the bot an admin first.' });
+                return;
             }
-            userMessage = userMessage.replace(/\.\s+/g, '.').trim();
-            const isGroup = chatId.endsWith('@g.us');
-
-            if (!isGroup && (userMessage === 'hi' || userMessage === 'hello')) {
-                await sock.sendMessage(chatId, { 
-                    text: 'Hi, How can I help you?\nYou can use .menu for more info and commands.' 
-                });
-                return; // Stop further processing if a private chat says "hi" or "hello"
-            }
-            
-            if (!userMessage.startsWith('.')) return;
-
-            let isSenderAdmin = false;
-            let isBotAdmin = false;
-
-            if (isGroup) {
-                const adminStatus = await isAdmin(sock, chatId, senderId);
-                isSenderAdmin = adminStatus.isSenderAdmin;
-                isBotAdmin = adminStatus.isBotAdmin;
-
-                if (!isBotAdmin) {
-                    await sock.sendMessage(chatId, { text: 'Please make the bot an admin first.' });
-                    return;
-                }
 
             if (
                 userMessage.startsWith('.mute') ||
@@ -112,7 +114,15 @@ async function startBot() {
 
         // Handle commands based on user message
         switch (true) {
-
+            case userMessage === '.simage': {
+                const quotedMessage = message.message?.extendedTextMessage?.contextInfo?.quotedMessage;
+                if (quotedMessage?.stickerMessage) {
+                    await simageCommand(sock, quotedMessage, chatId);
+                } else {
+                    await sock.sendMessage(chatId, { text: 'Please reply to a sticker with the .simage command to convert it.' });
+                }
+                break;
+            }
             case userMessage.startsWith('.kick'):
                 const mentionedJidListKick = message.message.extendedTextMessage?.contextInfo?.mentionedJid || [];
                 const replyMessageKick = message.message?.extendedTextMessage?.contextInfo?.quotedMessage || null;

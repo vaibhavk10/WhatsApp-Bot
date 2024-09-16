@@ -296,7 +296,7 @@ async function startBot() {
             if (shouldReconnect) {
                 startBot();
             } else {
-                console.log('Logged out from WhatsApp. Please restart the bot and scan the QR code again.');
+                console.log(chalk.red('Logged out from WhatsApp. Please restart the bot and scan the QR code again.'));
             }
         } else if (connection === 'open') {
             console.log(chalk.green('Connected to WhatsApp!'));

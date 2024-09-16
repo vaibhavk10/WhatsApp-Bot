@@ -2,7 +2,7 @@ const settings = {
   packname: 'My Sticker Pack',
   author: 'My Bot',
   botName: "Knight Bot",
-  botOwner: 'Vaibhav Kumawat',
+  botOwner: 'Professor',
   ownerNumber: '14703105589',
   giphyApiKey: 'qnl7ssQChTdPjsKta2Ax2LMaGXz303tq',
   commandMode: "public",

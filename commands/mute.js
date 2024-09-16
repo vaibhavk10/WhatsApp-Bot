@@ -1,8 +1,9 @@
-const isAdmin = require('../helpers/isAdmin'); // Ensure this helper is imported to check admin status
+const isAdmin = require('../helpers/isAdmin');
 
 async function muteCommand(sock, chatId, senderId, durationInMinutes) {
-    const { isSenderAdmin, isBotAdmin } = await isAdmin(sock, chatId, senderId);
+    console.log(`Attempting to mute the group for ${durationInMinutes} minutes.`); // Log for debugging
 
+    const { isSenderAdmin, isBotAdmin } = await isAdmin(sock, chatId, senderId);
     if (!isBotAdmin) {
         await sock.sendMessage(chatId, { text: 'Please make the bot an admin first.' });
         return;
@@ -13,13 +14,7 @@ async function muteCommand(sock, chatId, senderId, durationInMinutes) {
         return;
     }
 
-    if (!durationInMinutes || isNaN(durationInMinutes)) {
-        await sock.sendMessage(chatId, { text: 'Please specify a valid number of minutes to mute the group.' });
-        return;
-    }
-
     const durationInMilliseconds = durationInMinutes * 60 * 1000;
-
     try {
         await sock.groupSettingUpdate(chatId, 'announcement'); // Mute the group
         await sock.sendMessage(chatId, { text: `The group has been muted for ${durationInMinutes} minutes.` });

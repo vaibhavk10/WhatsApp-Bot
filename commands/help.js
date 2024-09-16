@@ -18,6 +18,7 @@ Available commands:
 .fact
 .weather <city>
 .news
+.meme
 
 *Admin Commands:*
 .ban @user
@@ -26,6 +27,10 @@ Available commands:
 .mute <minutes>
 .unmute
 .delete or .del
+.kick @user
+.warnings @user
+.warn @user
+.antilink
 
 *Game Commands:*
 .tictactoe @user
@@ -33,6 +38,7 @@ Available commands:
 
 *Group Management:*
 .tagall
+.tag <message>
 
 *Other:*
 .topmembers
@@ -41,14 +47,17 @@ Available commands:
 `;
 
     try {
+        // Path to image
         const imagePath = './assets/bot_image.jpg';
         if (fs.existsSync(imagePath)) {
             const imageBuffer = fs.readFileSync(imagePath);
+            // Send the message with the image
             await sock.sendMessage(chatId, { 
                 image: imageBuffer, 
                 caption: helpMessage 
             });
         } else {
+            // Fallback: Send just the text message if the image is not found
             await sock.sendMessage(chatId, { text: helpMessage });
         }
     } catch (error) {

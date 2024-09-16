@@ -10,7 +10,8 @@ This is a WhatsApp bot built using the Baileys library for group management, inc
    
 </a> 
     
-</p>g
+</p>
+
 ## ⚙️ Features
 
 - **Tag all group members** with the `.tagall` command

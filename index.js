@@ -150,7 +150,7 @@ async function startBot() {
                 }
                 break;
 
-            case userMessage === '.help' || userMessage === '.menu':
+            case userMessage === '.help' || userMessage === '.menu' || userMessage === '.bot' || userMessage === '.list':
                 await helpCommand(sock, chatId);
                 break;
 

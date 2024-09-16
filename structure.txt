@@ -1,0 +1,54 @@
+WhatsApp-Bot/
+│
+├── .gitignore              # Specifies files to ignore in version control
+├── .replit                 # Configuration for Replit (if using Replit platform)
+├── README.md               # Project documentation file
+├── index.js                # Main entry point of the bot
+├── package.json            # NPM configuration, metadata, and dependencies
+├── package-lock.json       # Lock file for NPM dependencies
+├── replit.nix              # Configuration file for Replit
+├── replace.txt             # Some file related to replacements (probably in code/text)
+├── replit_zip_error_log.txt # Error logs from Replit
+├── settings.js             # Configuration settings for the bot
+├── auth_info/              # Directory containing authentication-related data
+│
+├── commands/               # Contains JavaScript files for bot commands
+│   ├── antilink.js
+│   ├── ban.js
+│   ├── delete.js
+│   ├── demote.js
+│   ├── fact.js
+│   ├── gif.js
+│   ├── goodbye.js
+│   ├── help.js
+│   ├── joke.js
+│   ├── kick.js
+│   ├── meme.js
+│   ├── mute.js
+│   ├── news.js
+│   ├── owner.js
+│   ├── promote.js
+│   ├── quote.js
+│   ├── simage.js
+│   ├── sticker.js
+│   ├── tag.js
+│   ├── tagall.js
+│   ├── tictactoe.js
+│   ├── topmembers.js
+│   ├── tts.js
+│   ├── unmute.js
+│   ├── warn.js
+│   ├── warnings.js
+│   ├── weather.js
+│   └── welcome.js
+│
+├── data/                   # Data files for storing bot-related configurations or counts
+│   ├── antilinkSettings.json
+│   ├── messageCount.json
+│   └── warnings.json
+│
+├── helpers/                # Helper functions to support command functionality
+│   ├── antilinkHelper.js
+│   └── isAdmin.js
+│
+└── node_modules/           # Installed NPM dependencies (not shown in detail)

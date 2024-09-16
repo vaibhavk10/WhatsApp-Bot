@@ -4,13 +4,13 @@ This is a WhatsApp bot built using the Baileys library for group management, inc
 <div align="center">
 <a href="https://git.io/typing-svg"><img src="https://readme-typing-svg.demolab.com?font=Ribeye&size=50&pause=1000&color=33ff00&center=true&width=910&height=100&lines=Knight-Bot;Multi+Device+Whatsapp+Bot;Coded+By+Professor" alt="Typing SVG" /></a>
   
-<p align="center">  
+ 
   <a href="https://youtube.com/">
     <img alt=Knight Bot height="300" src="https://github.com/vaibhavk10/WhatsApp-Bot/blob/main/assets/bot_image.jpg">
    
 </a> 
     
-</p>
+
 
 ## ⚙️ Features
 

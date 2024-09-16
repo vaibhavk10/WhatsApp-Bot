@@ -26,7 +26,7 @@ It is lightweight and can be easily customized to add more commands as per your 
 
 You can easily deploy this WhatsApp bot on Replit with one click. Replit will automatically install the necessary dependencies and give you a web environment to run the bot.
 
-[![Run on Replit](https://replit.com/badge/github/vaibhavk10/Whatsapp-TagAll-Bot)](https://replit.com/github/vaibhavk10/Whatsapp-TagAll-Bot)
+[![Run on Replit](https://replit.com/badge/github/vaibhavk10/WhatsApp-Bot)](https://replit.com/github/vaibhavk10/WhatsApp-Bot)
 
 ---
 
@@ -42,8 +42,8 @@ You can easily deploy this WhatsApp bot on Replit with one click. Replit will au
 1. **Clone the repository:**
 
     ```bash
-    git clone https://github.com/vaibhavk10/Whatsapp-TagAll-Bot.git
-    cd Whatsapp-TagAll-Bot
+    git clone https://github.com/vaibhavk10/WhatsApp-Bot.git
+    cd WhatsApp-Bot
     ```
 
 2. **Install the dependencies:**
@@ -103,16 +103,17 @@ You can easily deploy this WhatsApp bot on Replit with one click. Replit will au
 
 ## 📄 License
 
-This project is licensed under the [MIT License](https://opensource.org/licenses/MIT) - see the [LICENSE](https://github.com/vaibhavk10/Whatsapp-TagAll-Bot/blob/main/LICENSE) file for details.
+This project is licensed under the [MIT License](https://opensource.org/licenses/MIT) - see the [LICENSE](https://github.com/vaibhavk10/WhatsApp-Bot/blob/main/LICENSE) file for details.
 
 ---
 
 ## 🙌 Contributions
 
-Contributions, issues, and feature requests are welcome! Feel free to check the [issues page](https://github.com/vaibhavk10/Whatsapp-TagAll-Bot/issues).
+Contributions, issues, and feature requests are welcome! Feel free to check the [issues page](https://github.com/vaibhavk10/WhatsApp-Bot/issues).
 
 ---
 
 ## 🌟 Show your support
 
-If you like this project, please give it a [⭐️ star on GitHub](https://github.com/vaibhavk10/Whatsapp-TagAll-Bot)!
+If you like this project, please give it a [⭐️ star on GitHub](https://github.com/vaibhavk10/WhatsApp-Bot)!
+ś

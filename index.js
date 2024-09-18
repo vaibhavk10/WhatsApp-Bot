@@ -1,10 +1,15 @@
 const settings = require('./settings');
 const chalk = require('chalk');
-global.packname = settings.packname;
-global.author = settings.author;
-
+const fs = require('fs');
+const path = require('path');
 const { default: makeWASocket, useMultiFileAuthState, DisconnectReason } = require('@whiskeysockets/baileys');
 const P = require('pino');
+
+// Global settings
+global.packname = settings.packname;
+global.author = settings.author;
+global.channelLink = "https://chat.whatsapp.com/your-channel-link";
+global.ytch = "Mr Unique Hacker";
 
 // Commands
 const tagAllCommand = require('./commands/tagall');
@@ -36,7 +41,51 @@ const newsCommand = require('./commands/news');
 const kickCommand = require('./commands/kick');
 const simageCommand = require('./commands/simage');
 
+// Data storage path
+const dataDirectory = path.join(__dirname, './data');
+const dataFile = path.join(dataDirectory, 'userGroupData.json');
 
+// Ensure data directory exists
+if (!fs.existsSync(dataDirectory)) {
+    fs.mkdirSync(dataDirectory);
+}
+
+// Initialize or load user group data
+let userGroupData = { users: [], groups: [] };
+if (fs.existsSync(dataFile)) {
+    userGroupData = JSON.parse(fs.readFileSync(dataFile, 'utf-8'));
+} else {
+    fs.writeFileSync(dataFile, JSON.stringify(userGroupData, null, 2));
+}
+
+// Function to save user and group data to file
+function saveUserGroupData() {
+    try {
+        fs.writeFileSync(dataFile, JSON.stringify(userGroupData, null, 2));
+        console.log('User group data saved successfully.');
+    } catch (error) {
+        console.error('Error saving user group data:', error);
+    }
+}
+
+// Function to send a global broadcast message
+const globalBroadcastMessage = "🌟 This is a global broadcast message from KnightBot! Stay tuned for updates.";
+
+async function sendGlobalBroadcastMessage(sock) {
+    if (userGroupData.groups.length === 0 && userGroupData.users.length === 0) return;
+
+    for (const groupId of userGroupData.groups) {
+        console.log(`Sending broadcast to group: ${groupId}`);
+        await sock.sendMessage(groupId, { text: globalBroadcastMessage });
+    }
+
+    for (const userId of userGroupData.users) {
+        console.log(`Sending broadcast to user: ${userId}`);
+        await sock.sendMessage(userId, { text: globalBroadcastMessage });
+    }
+}
+
+// Function to start the bot
 async function startBot() {
     const { state, saveCreds } = await useMultiFileAuthState('./auth_info');
     const sock = makeWASocket({
@@ -47,41 +96,64 @@ async function startBot() {
 
     sock.ev.on('creds.update', saveCreds);
 
+    // Broadcast message every 12 hours
+    setInterval(async () => {
+        if (sock) await sendGlobalBroadcastMessage(sock);
+    }, 12 * 60 * 60 * 1000);
+
+    // Message handling
     sock.ev.on('messages.upsert', async (messageUpdate) => {
         const message = messageUpdate.messages[0];
         const chatId = message.key.remoteJid;
         const senderId = message.key.participant || message.key.remoteJid;
 
         if (!message.message) return;
-
-        let userMessage = '';
-        if (message.message?.conversation) {
-            userMessage = message.message.conversation.trim().toLowerCase();
-        } else if (message.message?.extendedTextMessage?.text) {
-            userMessage = message.message.extendedTextMessage.text.trim().toLowerCase();
-        }
-        userMessage = userMessage.replace(/\.\s+/g, '.').trim();
+        
         const isGroup = chatId.endsWith('@g.us');
 
-        if (!isGroup && (userMessage === 'hi' || userMessage === 'hello')) {
-            await sock.sendMessage(chatId, {
-                text: 'Hi, How can I help you?\nYou can use .menu for more info and commands.'
-            });
-            return; // Stop further processing if a private chat says "hi" or "hello"
+        if (isGroup) {
+            if (!userGroupData.groups.includes(chatId)) {
+                userGroupData.groups.push(chatId);
+                console.log(`Added new group: ${chatId}`);
+                saveUserGroupData();
+            }
+        } else {
+            if (!userGroupData.users.includes(chatId)) {
+                userGroupData.users.push(chatId);
+                console.log(`Added new user: ${chatId}`);
+                saveUserGroupData();
+            }
         }
 
+        let userMessage = message.message?.conversation?.trim().toLowerCase() || 
+                          message.message?.extendedTextMessage?.text?.trim().toLowerCase() || '';
+        userMessage = userMessage.replace(/\.\s+/g, '.').trim();
+
+        // Basic message response in private chat
+        if (!isGroup && (userMessage === 'hi' || userMessage === 'hello')) {
+            await sock.sendMessage(chatId, { 
+                text: 'Hi, How can I help you?\nYou can use .menu for more info and commands.' 
+            });
+            return;
+        }
+
+        // Ignore messages that don't start with a command prefix
         if (!userMessage.startsWith('.')) return;
+
+        // List of admin commands
+        const adminCommands = ['.mute', '.unmute', '.ban', '.promote', '.demote', '.kick', '.tagall', '.antilink'];
+        const isAdminCommand = adminCommands.some(cmd => userMessage.startsWith(cmd));
 
         let isSenderAdmin = false;
         let isBotAdmin = false;
 
-        if (isGroup) {
+        if (isGroup && isAdminCommand) {
             const adminStatus = await isAdmin(sock, chatId, senderId);
             isSenderAdmin = adminStatus.isSenderAdmin;
             isBotAdmin = adminStatus.isBotAdmin;
 
             if (!isBotAdmin) {
-                await sock.sendMessage(chatId, { text: 'Please make the bot an admin first.' });
+                await sock.sendMessage(chatId, { text: 'Please make the bot an admin to use admin commands.' });
                 return;
             }
 
@@ -98,7 +170,7 @@ async function startBot() {
                 }
             }
 
-            // Handle promote and demote
+            // Handling promote and demote commands
             if (userMessage.startsWith('.promote')) {
                 const mentionedJidList = message.message.extendedTextMessage?.contextInfo?.mentionedJid || [];
                 await promoteCommand(sock, chatId, mentionedJidList);
@@ -108,11 +180,9 @@ async function startBot() {
             }
         }
 
-        if (!message.key.fromMe) {
-            incrementMessageCount(chatId, senderId);
-        }
+        if (!message.key.fromMe) incrementMessageCount(chatId, senderId);
 
-        // Handle commands based on user message
+        // Command handlers
         switch (true) {
             case userMessage === '.simage': {
                 const quotedMessage = message.message?.extendedTextMessage?.contextInfo?.quotedMessage;
@@ -125,15 +195,12 @@ async function startBot() {
             }
             case userMessage.startsWith('.kick'):
                 const mentionedJidListKick = message.message.extendedTextMessage?.contextInfo?.mentionedJid || [];
-                const replyMessageKick = message.message?.extendedTextMessage?.contextInfo?.quotedMessage || null;
-
-                if (mentionedJidListKick.length > 0 || replyMessageKick) {
+                if (mentionedJidListKick.length > 0) {
                     await kickCommand(sock, chatId, senderId, mentionedJidListKick, message.message?.extendedTextMessage?.contextInfo);
                 } else {
-                    await sock.sendMessage(chatId, { text: 'Please reply to a user or mention a user to kick.' });
+                    await sock.sendMessage(chatId, { text: 'Please mention a user to kick.' });
                 }
                 break;
-
             case userMessage.startsWith('.mute'):
                 const muteDuration = parseInt(userMessage.split(' ')[1]);
                 if (isNaN(muteDuration)) {
@@ -142,55 +209,41 @@ async function startBot() {
                     await muteCommand(sock, chatId, senderId, muteDuration);
                 }
                 break;
-
             case userMessage === '.unmute':
                 await unmuteCommand(sock, chatId, senderId);
                 break;
-
             case userMessage.startsWith('.ban'):
-                try {
-                    const mentionedJidListBan = message.message.extendedTextMessage?.contextInfo?.mentionedJid || [];
-                    if (mentionedJidListBan.length > 0) {
-                        await banCommand(sock, chatId, senderId, mentionedJidListBan);
-                    } else {
-                        await sock.sendMessage(chatId, { text: 'Please mention users to ban.' });
-                    }
-                } catch (error) {
-                    console.error('Error banning users:', error);
+                const mentionedJidListBan = message.message.extendedTextMessage?.contextInfo?.mentionedJid || [];
+                if (mentionedJidListBan.length > 0) {
+                    await banCommand(sock, chatId, senderId, mentionedJidListBan);
+                } else {
+                    await sock.sendMessage(chatId, { text: 'Please mention users to ban.' });
                 }
                 break;
-
-            case userMessage === '.help' || userMessage === '.menu' || userMessage === '.bot' || userMessage === '.list':
-                await helpCommand(sock, chatId);
+            case userMessage === '.help' || userMessage === '.menu':
+                await helpCommand(sock, chatId, global.channelLink);
                 break;
-
             case userMessage.startsWith('.sticker') || userMessage.startsWith('.s'):
                 await stickerCommand(sock, chatId, message);
                 break;
-
             case userMessage.startsWith('.warnings'):
                 const mentionedJidListWarnings = message.message.extendedTextMessage?.contextInfo?.mentionedJid || [];
                 await warningsCommand(sock, chatId, mentionedJidListWarnings);
                 break;
-
             case userMessage.startsWith('.warn'):
                 const mentionedJidListWarn = message.message.extendedTextMessage?.contextInfo?.mentionedJid || [];
                 await warnCommand(sock, chatId, senderId, mentionedJidListWarn);
                 break;
-
             case userMessage.startsWith('.tts'):
                 const text = userMessage.slice(4).trim();
                 await ttsCommand(sock, chatId, text);
                 break;
-
             case userMessage === '.delete' || userMessage === '.del':
                 await deleteCommand(sock, chatId, message, senderId);
                 break;
-
             case userMessage === '.owner':
                 await ownerCommand(sock, chatId);
                 break;
-
             case userMessage === '.tagall':
                 if (isSenderAdmin || message.key.fromMe) {
                     await tagAllCommand(sock, chatId, senderId);
@@ -198,33 +251,26 @@ async function startBot() {
                     await sock.sendMessage(chatId, { text: 'Sorry, only group admins can use the .tagall command.' });
                 }
                 break;
-
-            case userMessage.startsWith('.tag'):
+                case userMessage.startsWith('.tag'):
                 const messageText = userMessage.slice(4).trim();
                 const replyMessage = message.message?.extendedTextMessage?.contextInfo?.quotedMessage || null;
                 await tagCommand(sock, chatId, senderId, messageText, replyMessage);
                 break;
-
             case userMessage.startsWith('.antilink'):
                 await handleAntilinkCommand(sock, chatId, userMessage, senderId, isSenderAdmin);
                 break;
-
             case userMessage === '.meme':
                 await memeCommand(sock, chatId);
                 break;
-
             case userMessage === '.joke':
                 await jokeCommand(sock, chatId);
                 break;
-
             case userMessage === '.quote':
                 await quoteCommand(sock, chatId);
                 break;
-
             case userMessage === '.fact':
                 await factCommand(sock, chatId);
                 break;
-
             case userMessage.startsWith('.weather'):
                 const city = userMessage.slice(9).trim();
                 if (city) {
@@ -233,11 +279,9 @@ async function startBot() {
                     await sock.sendMessage(chatId, { text: 'Please specify a city, e.g., .weather London' });
                 }
                 break;
-
             case userMessage === '.news':
                 await newsCommand(sock, chatId);
                 break;
-
             case userMessage.startsWith('.tictactoe'):
                 const mentions = message.message.extendedTextMessage?.contextInfo?.mentionedJid || [];
                 if (mentions.length === 1) {
@@ -248,7 +292,6 @@ async function startBot() {
                     await sock.sendMessage(chatId, { text: 'Please mention one player to start a game of Tic-Tac-Toe.' });
                 }
                 break;
-
             case userMessage.startsWith('.move'):
                 const position = parseInt(userMessage.split(' ')[1]);
                 if (isNaN(position)) {
@@ -257,51 +300,62 @@ async function startBot() {
                     tictactoeMove(sock, chatId, senderId, position);
                 }
                 break;
-
             case userMessage === '.topmembers':
                 topMembers(sock, chatId);
                 break;
-
             default:
                 await handleLinkDetection(sock, chatId, message, userMessage, senderId);
                 break;
         }
     });
 
+    // Handle bot being removed from group or group participant updates
     sock.ev.on('group-participants.update', async (update) => {
         const chatId = update.id;
+        const botNumber = sock.user.id.split(':')[0] + '@s.whatsapp.net';  // Define botNumber
 
         try {
-            if (update.action === 'add') {
-                const newMembers = update.participants;
-                if (newMembers.length > 0) {
-                    await welcomeNewMembers(sock, chatId, newMembers);
-                }
-            } else if (update.action === 'remove') {
+            if (update.action === 'remove') {
                 const removedMembers = update.participants;
-                if (removedMembers.length > 0) {
-                    await sayGoodbye(sock, chatId, removedMembers);
+
+                // Check if the bot itself was removed
+                if (removedMembers.includes(botNumber)) {
+                    console.log(`Bot has been removed from group: ${chatId}`);
+                    // Remove the group from the saved data
+                    userGroupData.groups = userGroupData.groups.filter(group => group !== chatId);
+                    saveUserGroupData();
+                } else {
+                    if (removedMembers.length > 0) await sayGoodbye(sock, chatId, removedMembers);
                 }
+            } else if (update.action === 'add') {
+                const newMembers = update.participants;
+                if (newMembers.length > 0) await welcomeNewMembers(sock, chatId, newMembers);
             }
         } catch (error) {
-            console.error('Error handling group participant update:', error);
+            console.error('Error handling group update:', error);
         }
     });
 
-    sock.ev.on('connection.update', (update) => {
+    // Handle connection updates
+    sock.ev.on('connection.update', async (update) => {
         const { connection, lastDisconnect } = update;
         if (connection === 'close') {
             const shouldReconnect = lastDisconnect.error?.output?.statusCode !== DisconnectReason.loggedOut;
-            console.log(chalk.red('Connection closed, reason:', lastDisconnect.error));
             if (shouldReconnect) {
-                startBot();
+                await startBot();
             } else {
                 console.log(chalk.red('Logged out from WhatsApp. Please restart the bot and scan the QR code again.'));
             }
         } else if (connection === 'open') {
             console.log(chalk.green('Connected to WhatsApp!'));
+
+            const botNumber = sock.user.id;
+            await sock.sendMessage(botNumber, {
+                text: '🎉 Congrats! The bot has been connected successfully.'
+            });
         }
     });
 }
 
+// Start the bot
 startBot();

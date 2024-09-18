@@ -1,68 +1,84 @@
 const settings = require('../settings');
 const fs = require('fs');
 
-async function helpCommand(sock, chatId) {
+async function helpCommand(sock, chatId, channelLink) {
     const helpMessage = `
-*${settings.botName || 'WhatsApp Bot'}* - Version ${settings.version || '1.0.0'}
-_Bot by ${settings.botOwner || 'Unknown Owner'}_
+╔═══════════════════╗
+   *🤖 ${settings.botName || 'WhatsApp Bot'}*  
+   Version: *${settings.version || '1.0.0'}*
+   by ${settings.botOwner || 'Unknown Owner'}
+   YT : ${ytch}
+╚═══════════════════╝
 
-Available commands:
+*Available Commands:*
 
-*General Commands:*
-.help or .menu
-.tts <text>
-.sticker or .s
-.owner
-.joke
-.quote
-.fact
-.weather <city>
-.news
-.meme
+╔═══════════════════╗
+🌐 *General Commands*:
+║ ➤ .help or .menu
+║ ➤ .tts <text>
+║ ➤ .sticker or .s
+║ ➤ .owner
+║ ➤ .joke
+║ ➤ .quote
+║ ➤ .fact
+║ ➤ .weather <city>
+║ ➤ .news
+║ ➤ .meme
+║ ➤ .simage
+╚═══════════════════╝
 
-*Admin Commands:*
-.ban @user
-.promote @user
-.demote @user
-.mute <minutes>
-.unmute
-.delete or .del
-.kick @user
-.warnings @user
-.warn @user
-.antilink
+╔═══════════════════╗
+🛠️ *Admin Commands*:
+║ ➤ .ban @user
+║ ➤ .promote @user
+║ ➤ .demote @user
+║ ➤ .mute <minutes>
+║ ➤ .unmute
+║ ➤ .delete or .del
+║ ➤ .kick @user
+║ ➤ .warnings @user
+║ ➤ .warn @user
+║ ➤ .antilink
+╚═══════════════════╝
 
-*Game Commands:*
-.tictactoe @user
-.move <position>
+╔═══════════════════╗
+🎮 *Game Commands*:
+║ ➤ .tictactoe @user
+║ ➤ .move <position>
+╚═══════════════════╝
 
-*Group Management:*
-.tagall
-.tag <message>
+╔═══════════════════╗
+👥 *Group Management*:
+║ ➤ .tagall
+║ ➤ .tag <message>
+╚═══════════════════╝
 
-*Other:*
-.topmembers
+╔═══════════════════╗
+🏆 *Other*:
+║ ➤ .topmembers
+╚═══════════════════╝
 
-@KnightBot 2024 v1.0.0
+${channelLink ? `🔗 *Join our Channel:* \n${channelLink}` : 'No channel link available'}
+
+@${settings.botName || 'KnightBot'} 2024 v${settings.version || '1.0.0'}
 `;
 
     try {
-        // Path to image
         const imagePath = './assets/bot_image.jpg';
         if (fs.existsSync(imagePath)) {
             const imageBuffer = fs.readFileSync(imagePath);
-            // Send the message with the image
             await sock.sendMessage(chatId, { 
                 image: imageBuffer, 
                 caption: helpMessage 
             });
         } else {
-            // Fallback: Send just the text message if the image is not found
             await sock.sendMessage(chatId, { text: helpMessage });
         }
+
+    
+
     } catch (error) {
-        console.error('Error sending help message:', error);
-        await sock.sendMessage(chatId, { text: 'An error occurred while sending the help message. Please try again later.' });
+        await sock.sendMessage(chatId, { text: 'An error occurred while sending the help message.' });
     }
 }
 

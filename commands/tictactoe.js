@@ -28,7 +28,7 @@ function startGame(sock, chatId, playerX, playerO) {
     const board = [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '];
     games[chatId] = { board, playerX, playerO, turn: playerX };
 
-    sock.sendMessage(chatId, { text: `Tic-Tac-Toe started! @${playerX} is X and @${playerO} is O. @${playerX}, it's your turn!\n${printBoard(board)}`, mentions: [playerX, playerO] });
+    sock.sendMessage(chatId, { text: `Tic-Tac-Toe started! @${playerX} is ❌ and @${playerO} is ⚪️. @${playerX}, it's your turn!\n${printBoard(board)}`, mentions: [playerX, playerO] });
 }
 
 function makeMove(sock, chatId, player, position) {
@@ -45,7 +45,7 @@ function makeMove(sock, chatId, player, position) {
         return;
     }
 
-    board[position] = (player === playerX) ? 'X' : 'O';
+    board[position] = (player === playerX) ? '❌' : '⚪️';
     
     if (checkWinner(board, board[position])) {
         sock.sendMessage(chatId, { text: `@${player} wins!\n${printBoard(board)}`, mentions: [player] });

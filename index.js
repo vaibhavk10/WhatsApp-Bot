@@ -133,7 +133,7 @@ async function startBot() {
         userMessage = userMessage.replace(/\.\s+/g, '.').trim();
 
         // Basic message response in private chat
-        if (!isGroup && (userMessage === 'hi' || userMessage === 'hello')) {
+        if (!isGroup && (userMessage === 'hi' || userMessage === 'hello' || userMessage === 'bot')) {
             await sock.sendMessage(chatId, { 
                 text: 'Hi, How can I help you?\nYou can use .menu for more info and commands.' 
             });
@@ -223,7 +223,7 @@ async function startBot() {
                     await sock.sendMessage(chatId, { text: 'Please mention users to ban.' });
                 }
                 break;
-            case userMessage === '.help' || userMessage === '.menu':
+            case userMessage === '.help' || userMessage === '.menu' || userMessage === '.bot' || userMessage === '.list':
                 await helpCommand(sock, chatId, global.channelLink);
                 break;
             case userMessage.startsWith('.sticker') || userMessage.startsWith('.s'):

@@ -40,6 +40,8 @@ const weatherCommand = require('./commands/weather');
 const newsCommand = require('./commands/news');
 const kickCommand = require('./commands/kick');
 const simageCommand = require('./commands/simage');
+const attpCommand = require('./commands/attp');
+
 
 // Data storage path
 const dataDirectory = path.join(__dirname, './data');
@@ -108,7 +110,7 @@ async function startBot() {
         const senderId = message.key.participant || message.key.remoteJid;
 
         if (!message.message) return;
-        
+
         const isGroup = chatId.endsWith('@g.us');
 
         if (isGroup) {
@@ -125,14 +127,14 @@ async function startBot() {
             }
         }
 
-        let userMessage = message.message?.conversation?.trim().toLowerCase() || 
-                          message.message?.extendedTextMessage?.text?.trim().toLowerCase() || '';
+        let userMessage = message.message?.conversation?.trim().toLowerCase() ||
+            message.message?.extendedTextMessage?.text?.trim().toLowerCase() || '';
         userMessage = userMessage.replace(/\.\s+/g, '.').trim();
 
         // Basic message response in private chat
         if (!isGroup && (userMessage === 'hi' || userMessage === 'hello')) {
-            await sock.sendMessage(chatId, { 
-                text: 'Hi, How can I help you?\nYou can use .menu for more info and commands.' 
+            await sock.sendMessage(chatId, {
+                text: 'Hi, How can I help you?\nYou can use .menu for more info and commands.'
             });
             return;
         }
@@ -241,6 +243,9 @@ async function startBot() {
             case userMessage === '.delete' || userMessage === '.del':
                 await deleteCommand(sock, chatId, message, senderId);
                 break;
+            case userMessage.startsWith('.attp'):
+                await attpCommand(sock, chatId, message);
+                break;
             case userMessage === '.owner':
                 await ownerCommand(sock, chatId);
                 break;
@@ -251,7 +256,7 @@ async function startBot() {
                     await sock.sendMessage(chatId, { text: 'Sorry, only group admins can use the .tagall command.' });
                 }
                 break;
-                case userMessage.startsWith('.tag'):
+            case userMessage.startsWith('.tag'):
                 const messageText = userMessage.slice(4).trim();
                 const replyMessage = message.message?.extendedTextMessage?.contextInfo?.quotedMessage || null;
                 await tagCommand(sock, chatId, senderId, messageText, replyMessage);
@@ -356,6 +361,4 @@ async function startBot() {
         }
     });
 }
-
-// Start the bot
 startBot();

@@ -8,7 +8,7 @@ const P = require('pino');
 // Global settings
 global.packname = settings.packname;
 global.author = settings.author;
-global.channelLink = "https://chat.whatsapp.com/your-channel-link";
+global.channelLink = "https://whatsapp.com/channel/0029Va90zAnIHphOuO8Msp3A";
 global.ytch = "Mr Unique Hacker";
 
 // Commands

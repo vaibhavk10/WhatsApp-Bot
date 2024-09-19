@@ -25,6 +25,7 @@ async function helpCommand(sock, chatId, channelLink) {
 ║ ➤ .news
 ║ ➤ .meme
 ║ ➤ .simage
+║ ➤ .attp <text>
 ╚═══════════════════╝
 
 ╔═══════════════════╗

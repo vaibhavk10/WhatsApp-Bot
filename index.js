@@ -41,8 +41,15 @@ const newsCommand = require('./commands/news');
 const kickCommand = require('./commands/kick');
 const simageCommand = require('./commands/simage');
 const attpCommand = require('./commands/attp');
-
-
+const { startHangman, guessLetter } = require('./commands/hangman');
+const { startTrivia, answerTrivia } = require('./commands/trivia');
+const { complimentCommand } = require('./commands/compliment');
+const { insultCommand } = require('./commands/insult');
+const { eightBallCommand } = require('./commands/eightball');
+const { lyricsCommand } = require('./commands/lyrics');
+const { dareCommand } = require('./commands/dare');
+const { truthCommand } = require('./commands/truth');
+const { clearCommand } = require('./commands/clear');
 
 // Data storage path
 const dataDirectory = path.join(__dirname, './data');
@@ -111,7 +118,7 @@ async function startBot() {
         const senderId = message.key.participant || message.key.remoteJid;
 
         if (!message.message) return;
-        
+
         const isGroup = chatId.endsWith('@g.us');
 
         if (isGroup) {
@@ -128,14 +135,14 @@ async function startBot() {
             }
         }
 
-        let userMessage = message.message?.conversation?.trim().toLowerCase() || 
-                          message.message?.extendedTextMessage?.text?.trim().toLowerCase() || '';
+        let userMessage = message.message?.conversation?.trim().toLowerCase() ||
+            message.message?.extendedTextMessage?.text?.trim().toLowerCase() || '';
         userMessage = userMessage.replace(/\.\s+/g, '.').trim();
 
         // Basic message response in private chat
         if (!isGroup && (userMessage === 'hi' || userMessage === 'hello' || userMessage === 'bot')) {
-            await sock.sendMessage(chatId, { 
-                text: 'Hi, How can I help you?\nYou can use .menu for more info and commands.' 
+            await sock.sendMessage(chatId, {
+                text: 'Hi, How can I help you?\nYou can use .menu for more info and commands.'
             });
             return;
         }
@@ -244,9 +251,9 @@ async function startBot() {
             case userMessage === '.delete' || userMessage === '.del':
                 await deleteCommand(sock, chatId, message, senderId);
                 break;
-                case userMessage.startsWith('.attp'):
-    await attpCommand(sock, chatId, message);
-    break;
+            case userMessage.startsWith('.attp'):
+                await attpCommand(sock, chatId, message);
+                break;
             case userMessage === '.owner':
                 await ownerCommand(sock, chatId);
                 break;
@@ -257,7 +264,7 @@ async function startBot() {
                     await sock.sendMessage(chatId, { text: 'Sorry, only group admins can use the .tagall command.' });
                 }
                 break;
-                case userMessage.startsWith('.tag'):
+            case userMessage.startsWith('.tag'):
                 const messageText = userMessage.slice(4).trim();
                 const replyMessage = message.message?.extendedTextMessage?.contextInfo?.quotedMessage || null;
                 await tagCommand(sock, chatId, senderId, messageText, replyMessage);
@@ -293,7 +300,7 @@ async function startBot() {
                 if (mentions.length === 1) {
                     const playerX = senderId;
                     const playerO = mentions[0];
-                    tictactoeCommand(sock, chatId, playerX, playerO);
+                    tictactoeCommand(sock, chatId, playerX, playerO, isGroup);
                 } else {
                     await sock.sendMessage(chatId, { text: 'Please mention one player to start a game of Tic-Tac-Toe.' });
                 }
@@ -307,8 +314,67 @@ async function startBot() {
                 }
                 break;
             case userMessage === '.topmembers':
-                topMembers(sock, chatId);
+                topMembers(sock, chatId, isGroup);
                 break;
+
+            case userMessage.startsWith('.hangman'):
+                startHangman(sock, chatId);
+                break;
+
+            case userMessage.startsWith('.guess'):
+                const guessedLetter = userMessage.split(' ')[1];
+                if (guessedLetter) {
+                    guessLetter(sock, chatId, guessedLetter);
+                } else {
+                    sock.sendMessage(chatId, { text: 'Please guess a letter using .guess <letter>' });
+                }
+                break;
+
+            case userMessage.startsWith('.trivia'):
+                startTrivia(sock, chatId);
+                break;
+
+            case userMessage.startsWith('.answer'):
+                const answer = userMessage.split(' ').slice(1).join(' ');
+                if (answer) {
+                    answerTrivia(sock, chatId, answer);
+                } else {
+                    sock.sendMessage(chatId, { text: 'Please provide an answer using .answer <answer>' });
+                }
+                break;
+            case userMessage.startsWith('.compliment'):
+                const mentionedComplimentUser = message.message.extendedTextMessage?.contextInfo?.mentionedJid[0];
+                await complimentCommand(sock, chatId, mentionedComplimentUser);
+                break;
+
+            case userMessage.startsWith('.insult'):
+                const mentionedInsultUser = message.message.extendedTextMessage?.contextInfo?.mentionedJid[0];
+                await insultCommand(sock, chatId, mentionedInsultUser);
+                break;
+
+            case userMessage.startsWith('.8ball'):
+                const question = userMessage.split(' ').slice(1).join(' ');
+                await eightBallCommand(sock, chatId, question);
+                break;
+
+            case userMessage.startsWith('.lyrics'):
+                const songTitle = userMessage.split(' ').slice(1).join(' ');
+                await lyricsCommand(sock, chatId, songTitle);
+                break;
+
+            case userMessage === '.dare':
+                await dareCommand(sock, chatId);
+                break;
+
+            case userMessage === '.truth':
+                await truthCommand(sock, chatId);
+                break;
+
+            case userMessage === '.clear':
+                if (isGroup) await clearCommand(sock, chatId);
+                break;
+
+
             default:
                 await handleLinkDetection(sock, chatId, message, userMessage, senderId);
                 break;

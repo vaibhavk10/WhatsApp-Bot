@@ -19,6 +19,7 @@
     "fs-extra": "^11.2.0",
     "gtts": "^0.2.1",
     "jimp": "^0.16.13",
+    "link-preview-js": "^3.0.5",
     "qrcode": "^1.5.4",
     "qrcode-terminal": "^0.12.0",
     "sharp": "^0.32.6",

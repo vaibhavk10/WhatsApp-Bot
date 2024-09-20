@@ -26,6 +26,8 @@ async function helpCommand(sock, chatId, channelLink) {
 ║ ➤ .meme
 ║ ➤ .simage
 ║ ➤ .attp <text>
+║ ➤ .lyrics <song_title>
+║ ➤ .8ball <question>
 ╚═══════════════════╝
 
 ╔═══════════════════╗
@@ -40,18 +42,31 @@ async function helpCommand(sock, chatId, channelLink) {
 ║ ➤ .warnings @user
 ║ ➤ .warn @user
 ║ ➤ .antilink
+║ ➤ .clear
 ╚═══════════════════╝
 
 ╔═══════════════════╗
 🎮 *Game Commands*:
 ║ ➤ .tictactoe @user
 ║ ➤ .move <position>
+║ ➤ .hangman
+║ ➤ .guess <letter>
+║ ➤ .trivia
+║ ➤ .answer <answer>
+║ ➤ .dare
+║ ➤ .truth
 ╚═══════════════════╝
 
 ╔═══════════════════╗
 👥 *Group Management*:
 ║ ➤ .tagall
 ║ ➤ .tag <message>
+╚═══════════════════╝
+
+╔═══════════════════╗
+🎉 *Fun Commands*:
+║ ➤ .compliment @user
+║ ➤ .insult @user
 ╚═══════════════════╝
 
 ╔═══════════════════╗
@@ -75,8 +90,6 @@ ${channelLink ? `🔗 *Join our Channel:* \n${channelLink}` : 'No channel link a
         } else {
             await sock.sendMessage(chatId, { text: helpMessage });
         }
-
-    
 
     } catch (error) {
         await sock.sendMessage(chatId, { text: 'An error occurred while sending the help message.' });

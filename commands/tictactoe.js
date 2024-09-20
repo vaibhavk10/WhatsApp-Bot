@@ -63,7 +63,12 @@ function makeMove(sock, chatId, player, position) {
     sock.sendMessage(chatId, { text: `@${game.turn}, it's your turn!\n${printBoard(board)}`, mentions: [game.turn] });
 }
 
-function tictactoeCommand(sock, chatId, playerX, playerO) {
+function tictactoeCommand(sock, chatId, playerX, playerO, isGroup) {
+    if (!isGroup) {
+        sock.sendMessage(chatId, { text: 'This command is only available in group chats.' });
+        return;
+    }
+
     if (!games[chatId]) {
         startGame(sock, chatId, playerX, playerO);
     } else {

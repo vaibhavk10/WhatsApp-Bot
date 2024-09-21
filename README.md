@@ -1,94 +1,121 @@
-<div align="center">
-  <a href="https://git.io/typing-svg">
-    <img src="https://readme-typing-svg.demolab.com?font=Ribeye&size=50&pause=1000&color=33ff00&center=true&width=910&height=100&lines=I+am+Professor;Web+Developer;Android+App+Developer" alt="Typing SVG">
-  </a>
-</div>
+# 🤖 Knight Bot
 
-<h1 align="center">Welcome! I'm Professor 👨‍🏫</h1>
-<h3 align="center">Android Developer | Web Developer | Cybersecurity Enthusiast | Bot Developer</h3>
+This is a WhatsApp bot built using the Baileys library for group management, including features like tagging all members, muting/unmuting, and many more. It's designed to help admins efficiently manage WhatsApp groups.
+<div align="center"> <a href="https://git.io/typing-svg"> <img src="https://readme-typing-svg.demolab.com?font=Ribeye&size=50&pause=1000&color=33ff00&center=true&width=910&height=100&lines=Knight-Bot;Multi+Device+Whatsapp+Bot;Coded+By+Professor" alt="Typing SVG" /> </a> </div> <div align="center"> <a href="https://youtube.com/"> <img src="https://github.com/vaibhavk10/WhatsApp-Bot/blob/main/assets/bot_image.jpg" alt="Knight Bot" height="300"> </a> </div>
 
----
 
-### 🚀 About Me
+## ⚙️ Features
 
-- 👨‍🏫 **Professor** - Owner of [Mr Unique Hacker](https://www.youtube.com/@mr_unique_hacker)
-- 🤖 Working on **Knight Bot**, a Multi-Device WhatsApp Bot
-- 💻 Skilled in **Android Development**, **Web Development**, **Cybersecurity**, and **Bot Development**
-- 🎥 **YouTuber** at [Mr Unique Hacker](https://www.youtube.com/@mr_unique_hacker) 
-- 🌱 Always learning new tech and building innovative projects
+- **Tag all group members** with the `.tagall` command
+- **Admin restricted usage** (Only group admins can use certain commands)
+- **Games** like Tic-Tac-Toe for interactive group engagement
+- **Text-to-Speech** with `.tts`
+- **Sticker creation** with `.sticker`
+- **Anti-link detection** for group safety
+- **Warn and manage group members** with admin control
 
 ---
 
-<div align="center">
-  <h2>🚀 Projects and Bots</h2>
-  <p>Check out some of the awesome projects and bots I'm working on.</p>
+## 📖 About
 
-  <a href="https://github.com/YourUsername/Knight-Bot" target="_blank">
-    <img src="https://img.shields.io/badge/Knight_Bot-Multi_Device_Whatsapp_Bot-green?style=for-the-badge&logo=whatsapp" alt="Knight Bot">
-  </a>
-  <br>
-  <a href="https://github.com/YourUsername/ProjectName" target="_blank">
-    <img src="https://img.shields.io/badge/Other_Project-Description-orange?style=for-the-badge&logo=github" alt="Other Project">
-  </a>
-</div>
+The Knight WhatsApp Bot assists group admins by providing them with tools to efficiently manage large WhatsApp groups. The bot uses the Baileys library to interact with the WhatsApp Web API and supports multi-device features.
+
+It is lightweight and can be easily customized to add more commands as per your requirements. The bot runs in a Node.js environment and provides QR code-based authentication to link your WhatsApp account.
 
 ---
 
-### 🔧 Skills
+## One-click Deployment on Replit
 
-- **Android App Development**
-- **Full-Stack Web Development**
-- **Cybersecurity Enthusiast**
-- **Bot Developer**
+You can easily deploy this WhatsApp bot on Replit with one click. Replit will automatically install the necessary dependencies and give you a web environment to run the bot.
 
----
-
-<div align="center">
-  <h2>🌟 GitHub Stats</h2>
-  <img src="https://github-readme-stats.vercel.app/api?username=YourUsername&show_icons=true&theme=radical" alt="GitHub Stats">
-  <br>
-  <img src="https://github-readme-streak-stats.herokuapp.com/?user=YourUsername&theme=radical" alt="GitHub Streak">
-  <br>
-  <img src="https://github-readme-stats.vercel.app/api/top-langs/?username=YourUsername&layout=compact&theme=radical" alt="Most Used Languages">
-</div>
+[![Run on Replit](https://replit.com/badge/github/vaibhavk10/WhatsApp-Bot)](https://replit.com/github/vaibhavk10/WhatsApp-Bot)
 
 ---
 
-<div align="center">
-  <h2>📊 GitHub Activity Graph</h2>
-  <img src="https://activity-graph.herokuapp.com/graph?username=YourUsername&theme=react-dark&area=true&hide_border=true" alt="GitHub Activity Graph">
-</div>
+## 🛠️ Setup & Installation
+
+### Prerequisites
+
+- Node.js installed on your system
+- Git installed (for cloning the repository)
+
+### Step-by-Step Setup
+
+1. **Clone the repository:**
+
+    ```bash
+    git clone https://github.com/vaibhavk10/WhatsApp-Bot.git
+    cd WhatsApp-Bot
+    ```
+
+2. **Install the dependencies:**
+
+    ```bash
+    npm install
+    ```
+
+3. **Run the bot:**
+
+    ```bash
+    node index.js
+    ```
+
+4. **Scan the QR code:**
+
+    Once the bot starts, a QR code will appear in the terminal. Scan this QR code using the Linked Devices feature in WhatsApp to connect your WhatsApp account with the bot.
 
 ---
 
-### 🌍 Connect with Me
+## 📝 Commands
 
-<p align="center">
-  <a href="https://www.youtube.com/@mr_unique_hacker" target="_blank"><img src="https://img.shields.io/badge/YouTube-MrUniqueHacker-FF0000?style=for-the-badge&logo=youtube&logoColor=white"></a>
-  <a href="https://t.me/+AjUcOaQyFRllMDZl" target="_blank"><img src="https://img.shields.io/badge/Telegram-Join%20Now-blue?style=for-the-badge&logo=telegram"></a>
-  <a href="https://whatsapp.com/channel/0029Va90zAnIHphOuO8Msp3A" target="_blank"><img src="https://img.shields.io/badge/WhatsApp-Subscribe-brightgreen?style=for-the-badge&logo=whatsapp"></a>
-</p>
+### General Commands:
+
+- `.help` or `.menu`
+- `.tts <text>`
+- `.sticker` or `.s`
+- `.owner`
+
+### Admin Commands:
+
+- `.ban @user`
+- `.promote @user`
+- `.demote @user`
+- `.mute <minutes>`
+- `.unmute`
+- `.delete` or `.del`
+- `.kick @user`
+- `.warnings @user`
+- `.warn @user`
+- `.antilink`
+
+### Game Commands:
+
+- `.tictactoe @user`
+- `.move <position>`
+
+### Group Management:
+
+- `.tagall`
+
+### Other:
+
+- `.topmembers`
 
 ---
 
-<div align="center">
-  <h2>📈 GitHub Contributions</h2>
-  <img src="https://github-contribution-stats.vercel.app/api/?username=YourUsername" alt="GitHub Contributions">
-</div>
+## 📄 License
+
+This project is licensed under the [MIT License](https://opensource.org/licenses/MIT) - see the [LICENSE](https://github.com/vaibhavk10/WhatsApp-Bot/blob/main/LICENSE) file for details.
 
 ---
 
-### 🎥 Latest YouTube Videos
+## 🙌 Contributions
 
-<div align="center">
-  <a href="https://www.youtube.com/@mr_unique_hacker">
-    <img src="https://github-readme-youtube-stats.herokuapp.com/?username=mr_unique_hacker&theme=radical" alt="YouTube Stats">
-  </a>
-</div>
+Contributions, issues, and feature requests are welcome! Feel free to check the [issues page](https://github.com/vaibhavk10/WhatsApp-Bot/issues).
 
 ---
 
-<div align="center">
-  <h2>✨ Thanks for visiting my GitHub! ✨</h2>
-  <img src="https://media.giphy.com/media/Q7LHmoFwVP6Yc1swZs/giphy.gif" width="300" alt="Thanks Gif">
-</div>
+## 🌟 Show your support
+
+If you like this project, please give it a [⭐️ star on GitHub](https://github.com/vaibhavk10/WhatsApp-Bot)!
+ś
